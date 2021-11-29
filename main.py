@@ -1,6 +1,9 @@
 import lab1
 import lab2
+import lab3
 
 # lab1.start_lab1()
 
-lab2.start_lab2()
+# lab2.start_lab2()
+
+lab3.start()
