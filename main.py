@@ -13,4 +13,4 @@ import lab5
 
 #lab4.start()
 
-lab5.start_evolution()
+lab5.start()
