@@ -11,6 +11,6 @@ import lab5
 
 #lab3.start()
 
-#lab4.start()
+lab4.start()
 
-lab5.start()
+#lab5.start()

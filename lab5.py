@@ -1,3 +1,4 @@
+import copy
 import math
 import random
 import matplotlib.pyplot as plt
@@ -16,10 +17,8 @@ products = [
     [6.9, 3.6, 8.2, 556]
 ]
 
-# Цены на продукты
 prices = [698, 876, 941, 230, 249, 269, 612, 287, 884, 482]
 
-# Набор хромосом (каждый массив - рацион из 10 продуктов)
 chromosomes = [
     [0, 0, 0, 0, 1, 1, 1, 0, 1, 0],
     [1, 1, 1, 0, 0, 1, 1, 1, 1, 0],
@@ -28,29 +27,25 @@ chromosomes = [
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 1]
 ]
 
-# Эталон по суммарному количеству Белков, Жиров, Углеводов и Ккал
+chromosomes_count = 5
+
 standard = [50, 20, 50, 1500]
 
 
-# Высчитать цену покупки
 def calculate_price(_chromosome):
-    # print(_chromosome)
     price = 0
     for i in range(len(_chromosome)):
         if _chromosome[i] == 1:
             price += prices[i]
-    # print("Цена покупки: ", price)
     return price
 
 
-# Высчитать коэффициент приспособленности
 def fitness(_chromosome):
     temp_characteristics = [0, 0, 0, 0]
     for i in range(len(_chromosome)):
         if _chromosome[i] == 1:
             for characteristic_index in range(len(temp_characteristics)):
                 temp_characteristics[characteristic_index] += products[i][characteristic_index]
-    # print(f'\nХарактеристики получившейся хромосомы: {temp_characteristics}')
 
     percent_differences = [0, 0, 0, 0]
 
@@ -58,39 +53,31 @@ def fitness(_chromosome):
         percent_differences[characteristic_index] = abs(temp_characteristics[characteristic_index] -
                                                         standard[characteristic_index]) / standard[characteristic_index]
 
-    # print(f'\nПроцентные отклонения: {percent_differences}')
-
     percent_fitness = 0
 
     for percent_difference_index in range(len(percent_differences)):
         percent_fitness += percent_differences[percent_difference_index]
 
-    # print(f'\nОтклонение хромосомы от эталона: {percent_fitness}')
-
     return percent_fitness
 
 
-# Выбрать лучшие хромосомы
 def select_chromosomes(_chromosomes):
     sorted_chromosomes = sorted(_chromosomes.items(), key=lambda x: x[0])
 
     surviving_chromosomes = {}
 
-    # передавать саму хромасому
-    for _chromosome_index in range(math.ceil(len(sorted_chromosomes) * 0.7)):
-        surviving_chromosomes[fitness(sorted_chromosomes[_chromosome_index][1])] = \
-            sorted_chromosomes[_chromosome_index][1]
+    for i in range(math.ceil(len(sorted_chromosomes) * 0.7)):
+        surviving_chromosomes[fitness(sorted_chromosomes[i][1])] = \
+            sorted_chromosomes[i][1]
 
     return surviving_chromosomes
 
 
-# Скрестить хромосомы
 def cross_chromosomes(_chromosomes):
-
     crossed_chromosomes = {}
 
-    chr_1_val = []
-    chr_2_val = []
+    v1 = []
+    v2 = []
 
     index = 0
 
@@ -99,58 +86,66 @@ def cross_chromosomes(_chromosomes):
         # поменять скрещивание
 
         if index == 0:
-            chr_1_val = _chromosome[1]
+            v1 = _chromosome[1]
             index += 1
             continue
 
         if index == 1:
-            chr_2_val = _chromosome[1]
+            v2 = _chromosome[1]
             index += 1
-            # continue
 
         if index == 2:
             child_chromosome_1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            child_chromosome_1[0] = chr_1_val[0]
-            child_chromosome_1[1] = chr_1_val[1]
-            child_chromosome_1[2] = chr_2_val[2]
-            child_chromosome_1[3] = chr_2_val[3]
-            child_chromosome_1[4] = chr_1_val[4]
-            child_chromosome_1[5] = chr_1_val[5]
-            child_chromosome_1[6] = chr_2_val[6]
-            child_chromosome_1[7] = chr_2_val[7]
-            child_chromosome_1[8] = chr_1_val[8]
-            child_chromosome_1[9] = chr_1_val[9]
+            child_chromosome_1[0] = v1[0]
+            child_chromosome_1[1] = v1[1]
+            child_chromosome_1[2] = v2[2]
+            child_chromosome_1[3] = v2[3]
+            child_chromosome_1[4] = v1[4]
+            child_chromosome_1[5] = v1[5]
+            child_chromosome_1[6] = v2[6]
+            child_chromosome_1[7] = v2[7]
+            child_chromosome_1[8] = v1[8]
+            child_chromosome_1[9] = v1[9]
 
             child_chromosome_2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            child_chromosome_2[0] = chr_2_val[0]
-            child_chromosome_2[1] = chr_2_val[1]
-            child_chromosome_2[2] = chr_2_val[2]
-            child_chromosome_2[3] = chr_2_val[3]
-            child_chromosome_2[4] = chr_2_val[4]
-            child_chromosome_2[5] = chr_1_val[5]
-            child_chromosome_2[6] = chr_1_val[6]
-            child_chromosome_2[7] = chr_1_val[7]
-            child_chromosome_2[8] = chr_1_val[8]
-            child_chromosome_2[9] = chr_1_val[9]
+            child_chromosome_2[0] = v2[0]
+            child_chromosome_2[1] = v2[1]
+            child_chromosome_2[2] = v1[2]
+            child_chromosome_2[3] = v1[3]
+            child_chromosome_2[4] = v2[4]
+            child_chromosome_2[5] = v2[5]
+            child_chromosome_2[6] = v1[6]
+            child_chromosome_2[7] = v1[7]
+            child_chromosome_2[8] = v2[8]
+            child_chromosome_2[9] = v2[9]
 
-            # вынести в метод
+            check_and_set(child_chromosome_1, _chromosomes, crossed_chromosomes)
+            check_and_set(child_chromosome_2, _chromosomes, crossed_chromosomes)
 
-            key_1 = fitness(child_chromosome_1)
-            if key_1 not in _chromosomes:
-                crossed_chromosomes[key_1] = child_chromosome_1
-
-            key_2 = fitness(child_chromosome_2)
-            if key_2 not in _chromosomes:
-                crossed_chromosomes[key_2] = child_chromosome_2
             index = 0
+
+    i = 1
+    j = 1
+
+    temp_chromesome = copy.copy(crossed_chromosomes)
+
+    for _chromosome in temp_chromesome.items():
+        if crossed_chromosomes.__len__() > chromosomes_count:
+            crossed_chromosomes.__delitem__(_chromosome[0])
 
     for _chromosome in crossed_chromosomes.items():
         _chromosomes[_chromosome[0]] = _chromosome[1]
+         
 
     return _chromosomes
 
 
-# Мутировать одну их хромосом
+def check_and_set(child_chromosome, _chromosomes, crossed_chromosomes):
+    key = fitness(child_chromosome)
+    if key not in _chromosomes:
+        crossed_chromosomes[key] = child_chromosome
+
+
 def mutate_chromosomes(_chromosomes):
     for i in range(3):
 
@@ -169,35 +164,36 @@ def mutate_chromosomes(_chromosomes):
     return _chromosomes
 
 
-def start_evolution():
+def print_chromosomes(_chromosomes, i):
+    for key, value in _chromosomes.items():
+        print("Итерация: ", i, ". Отклонение: ", round(key, 1), ". Набор хромосом: ", value)
+        print("Количество хромосом: ", len(_chromosomes))
+
+
+def start():
     cycle_chromosomes = {}
 
-    for _chromosome_index in range(len(chromosomes)):
-        cycle_chromosomes[fitness(chromosomes[_chromosome_index])] = chromosomes[_chromosome_index]
-
-    print("Изначальный набор хромосом:", cycle_chromosomes)
-
-    # Лучшая хромосома
     best_chromosome = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-    # Лучшая приспособленность
     best_fitness = 100
-
-    # Максимальная допустимая цена (Сумма продуктов рациона не должна ее превышать)
-    acceptable_price = 10000
-
+    max_price = 10000
     step = 0
-
     iteration = 1
-
     common_fitness_array = []
     best_fitness_array = []
 
-    while step < 10:
+    for i in range(len(chromosomes)):
+        cycle_chromosomes[fitness(chromosomes[i])] = chromosomes[i]
+
+    print("Изначальный набор хромосом:")
+    for key, value in cycle_chromosomes.items():
+        print(" Отклонение: ", round(key, 1), ". Набор хромосом: ", value)
+
+    while step < 50:
         cycle_chromosomes = select_chromosomes(cycle_chromosomes)
         cycle_chromosomes = cross_chromosomes(cycle_chromosomes)
         cycle_chromosomes = mutate_chromosomes(cycle_chromosomes)
-        print("Итерация: ", iteration, ". Набор хромосом: ", cycle_chromosomes)
+
+        print_chromosomes(cycle_chromosomes, iteration)
         print("Количество хромосом: ", len(cycle_chromosomes))
 
         sum_fitness = 0
@@ -213,9 +209,9 @@ def start_evolution():
 
         for _chromosome in cycle_chromosomes.items():
 
-            if calculate_price(_chromosome[1]) < acceptable_price:
+            if calculate_price(_chromosome[1]) < max_price:
                 if fitness(_chromosome[1]) < best_fitness:
-                    for i in range(10):
+                    for i in range(5):
                         best_chromosome[i] = _chromosome[1][i]
                     best_fitness = fitness(_chromosome[1])
                     step = 0
