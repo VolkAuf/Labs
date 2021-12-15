@@ -154,7 +154,6 @@ def start():
     print("Введите размер фильтра")
     val = int(input())
 
-
     filter1 = BloomFilter(val)
     filter2 = BloomFilter(val)
 
@@ -179,11 +178,11 @@ def start():
 
     print("Поиск слова Саруман в фильтре 1:")
     start_time = time.perf_counter_ns()
-    print(filter1.check_in_filter("Хоббиты"))
-    first_time =(time.perf_counter_ns() - start_time)
-    print("Перебор нашел слово за - " + str(first_time/1000000) + " мс")
+    print(filter1.check_in_filter("Саруман"))
+    first_time = (time.perf_counter_ns() - start_time)
+    print("Перебор нашел слово за - " + str(first_time / 1000000) + " мс")
 
     filter1.merge_filter(filter2)
     print("Поиск слова Саруман в фильтре 1 после объединения с фильтром 2:")
-    print(filter1.check_in_filter("Хоббиты"))
-    print("Перебор нашел слово за - " + str((time.perf_counter_ns() - first_time)/1000000000) + " с")
+    print(filter1.check_in_filter("Саруман"))
+    print("Перебор нашел слово за - " + str((time.perf_counter_ns() - first_time) / 1000000000) + " с")
