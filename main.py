@@ -9,8 +9,8 @@ import lab5
 
 # lab2.start_lab2()
 
-#lab3.start()
+# lab3.start()
 
-lab4.start()
+# lab4.start()
 
-#lab5.start()
+lab5.start()
